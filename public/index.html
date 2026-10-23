@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>排班系统 · Shift Planner</title>
+  <script>
+    // 发布平台要求每个请求都携带 ?sharecode=xxx。
+    // 这里读取当前 URL 的查询参数，并把它注入到样式/脚本/后续 API 请求中，
+    // 否则相对路径请求会被平台拒绝（403 / 链接不完整）。
+    (function () {
+      var sc = location.search || '';
+      var q = sc ? (sc + '&') : '?';
+      var v = '_v=3';
+      document.write('<link rel="stylesheet" href="./styles.css' + q + v + '">');
+      document.write('<script src="./app.js' + q + v + '"><\/script>');
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🗓️</span>
+      <div>
+        <h1>排班系统</h1>
+        <p class="sub">Shift Planner · 公网可试用</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="resetBtn" class="btn ghost" title="恢复示例数据">重置示例</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="board">排班表</button>
+    <button class="tab" data-tab="employees">员工</button>
+    <button class="tab" data-tab="shifts">班次类型</button>
+    <button class="tab" data-tab="stats">统计</button>
+  </nav>
+
+  <main>
+    <!-- 排班表 -->
+    <section class="panel active" id="panel-board">
+      <div class="board-toolbar">
+        <button id="prevWeek" class="btn small">‹ 上周</button>
+        <strong id="weekLabel">—</strong>
+        <button id="nextWeek" class="btn small">下周 ›</button>
+        <span class="hint">点表格格子排班，再次点击可改/删除</span>
+      </div>
+      <div class="board-wrap">
+        <table id="board" class="board"></table>
+      </div>
+      <div id="conflictBar" class="conflict-bar" hidden></div>
+    </section>
+
+    <!-- 员工 -->
+    <section class="panel" id="panel-employees">
+      <form id="empForm" class="row-form">
+        <input id="empName" placeholder="姓名" required />
+        <input id="empRole" placeholder="角色" />
+        <input id="empMax" type="number" min="0" max="168" value="40" title="每周最大工时" />
+        <button class="btn" type="submit">+ 添加员工</button>
+      </form>
+      <ul id="empList" class="card-list"></ul>
+    </section>
+
+    <!-- 班次类型 -->
+    <section class="panel" id="panel-shifts">
+      <form id="shiftForm" class="row-form">
+        <input id="shiftName" placeholder="班次名（如 早班）" required />
+        <input id="shiftStart" type="time" value="08:00" />
+        <input id="shiftEnd" type="time" value="16:00" />
+        <input id="shiftColor" type="color" value="#2f6df6" />
+        <button class="btn" type="submit">+ 添加班次</button>
+      </form>
+      <ul id="shiftList" class="card-list"></ul>
+    </section>
+
+    <!-- 统计 -->
+    <section class="panel" id="panel-stats">
+      <h3>本周工时（每人）</h3>
+      <ul id="statsHours" class="card-list"></ul>
+      <h3>每日覆盖</h3>
+      <div id="statsCoverage" class="coverage"></div>
+    </section>
+  </main>
+
+  <!-- 单元格排班弹层 -->
+  <div id="cellPop" class="pop" hidden>
+    <div class="pop-head"><span id="popTitle"></span><button id="popClose" class="x">×</button></div>
+    <div id="popShifts" class="pop-shifts"></div>
+    <button id="popClear" class="btn ghost small">清除该格</button>
+  </div>
+
+  <footer class="foot">零依赖 Node 服务 · 数据保存在服务端 · 公网多人共享同一份排班</footer>
+</body>
+</html>
